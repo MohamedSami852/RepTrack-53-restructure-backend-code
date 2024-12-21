@@ -1,9 +1,9 @@
-name: Deploy to Azure App Service (Container Mode)
+name: Build and Deploy to Azure
 
 on:
   push:
     branches:
-      - 53-restructure-backend-code  # Trigger deployment on pushes to the main branch
+      - main
 
 jobs:
   build-and-deploy:
@@ -11,31 +11,61 @@ jobs:
 
     steps:
       # Step 1: Check out the code
-      - name: Checkout Code
+      - name: Check out code
         uses: actions/checkout@v3
 
       # Step 2: Log in to Azure
-      - name: Azure Login
+      - name: Log in to Azure
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+      # step 3 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
 
-      # Step 3: Log in to Azure Container Registry (ACR)
-      - name: Log in to Azure Container Registry
+
+      # Step 3: Log in to Azure Container Registry
+      - name: Log in to ACR
+        run: echo "${{ secrets.ACR_PASSWORD }}" | docker login reptrack.azurecr.io -u "${{ secrets.ACR_USERNAME }}" --password-stdin
+      
+      - name: Build Docker image
+        env:
+          ENVIRONMENT: production
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD}}
+          SMTP_EMAIL: ${{ secrets.SMTP_EMAIL }}
         run: |
-          az acr login --name reptrackcontainer
+          DOCKER_BUILDKIT=1 docker build \
+                --secret id=smtp_email,src=<(echo ${{ secrets.SMTP_EMAIL }}) \
+                --secret id=smtp_password,src=<(echo ${{ secrets.SMTP_PASSWORD }}) \
+                --secret id=supabase_key,src=<(echo ${{ secrets.SUPABASE_KEY }}) \
+                --secret id=supabase_url,src=<(echo ${{ secrets.SUPABASE_URL }}) \
+                -t reptrack.azurecr.io/django-app:latest .
 
-      # Step 4: Build and Push Docker Image to ACR
-      - name: Build and Push Docker Image
-        uses: docker/build-push-action@v5
-        with:
-          context: .  # Path to the Dockerfile
-          push: true
-          tags: reptrackcontainer.azurecr.io/reptrackimage:${{ github.sha }}
 
-      # Step 5: Deploy to Azure App Service
-      - name: Deploy to Azure App Service
+
+      # Step 5: Test the Docker image locally
+      - name: Run Docker container to test
+        run: |
+          docker run -d --name django-backend \
+                     -e SUPABASE_KEY=${{ secrets.SUPABASE_KEY }} \
+                     -e SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
+                     -e SMTP_EMAIL=${{ secrets.SMTP_EMAIL }} \
+                     -e SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }} \
+                     -p 8000:8000 reptrack.azurecr.io/django-app:latest
+          sleep 30
+          curl --fail http://localhost:8000/ || (docker logs django-backend && exit 1)
+          docker stop django-backend
+          docker rm django-backend
+
+      # Step 6: Push the Docker image to ACR
+      - name: Push Docker image
+        run: docker push reptrack.azurecr.io/django-app:latest
+
+      # Step 7: Deploy the Docker image to Azure Web App
+      - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: Reptrack-main-app  # Replace with your Azure App Service name
-          images: reptrackcontainer.azurecr.io/reptrackimage:${{ github.sha }}
+          app-name: Reptrack-production
+          images: reptrack.azurecr.io/django-app:latest
