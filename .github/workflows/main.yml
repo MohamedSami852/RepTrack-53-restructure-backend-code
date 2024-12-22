@@ -45,7 +45,7 @@ jobs:
 
 
 
-      # Step 5: Run the Docker container
+      # Step 5: Run the Docker container locally
       - name: Run Docker Container
         run: |
           docker run -d \
@@ -55,7 +55,7 @@ jobs:
             -e SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
             -p 8000:8000 \
             --name django-app \
-            reptrack.azurecr.io/django-app:latest
+            django-app:latest
           # sleep 30
           # curl --fail http://localhost:8000/ || (docker logs django-backend && exit 1)
           # docker stop django-backend
