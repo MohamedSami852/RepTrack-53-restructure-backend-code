@@ -23,14 +23,14 @@ jobs:
       uses: docker/login-action@v2
       with:
         registry: https://reptrackproduction.azurecr.io/
-        username: ${{ secrets.AzureAppService_ContainerUsername_641ba4d81324445ebee060e3e996f658 }}
-        password: ${{ secrets.AzureAppService_ContainerPassword_4ec167a95cfc4b8483b1dc3d5f832a97 }}
+        username: ${{ secrets.AzureAppService_ContainerUsername_1e63b3b96fed4187a79269f73e2a9679 }}
+        password: ${{ secrets.AzureAppService_ContainerPassword_e205071dd1e840aba03e05eaeabf8746 }}
 
     - name: Build and push container image to registry
       uses: docker/build-push-action@v3
       with:
         push: true
-        tags: reptrackproduction.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_641ba4d81324445ebee060e3e996f658 }}/reptrack:${{ github.sha }}
+        tags: reptrackproduction.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_1e63b3b96fed4187a79269f73e2a9679 }}/v1.1.1:${{ github.sha }}
         file: ./Dockerfile
 
   deploy:
@@ -47,5 +47,5 @@ jobs:
       with:
         app-name: 'Reptrack-production'
         slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_9b766f59aed24526bfd0b25fdd783f51 }}
-        images: 'reptrackproduction.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_641ba4d81324445ebee060e3e996f658 }}/reptrack:${{ github.sha }}'
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_e4704ed60684459da22d6ef5cbdc32c3 }}
+        images: 'reptrackproduction.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_1e63b3b96fed4187a79269f73e2a9679 }}/v1.1.1:${{ github.sha }}'
