@@ -26,7 +26,7 @@ jobs:
 
       # Step 3: Log in to Azure Container Registry
       - name: Log in to ACR
-        run: echo "${{ secrets.ACR_PASSWORD }}" | docker login reptrack.azurecr.io -u "${{ secrets.ACR_USERNAME }}" --password-stdin
+        run: echo "${{ secrets.ACR_PASSWORD }}" | docker login reptrackproduction.azurecr.io -u "${{ secrets.ACR_USERNAME }}" --password-stdin
       
       - name: Build Docker image
         env:
@@ -41,7 +41,7 @@ jobs:
                 --secret id=smtp_password,src=<(echo ${{ secrets.SMTP_PASSWORD }}) \
                 --secret id=supabase_key,src=<(echo ${{ secrets.SUPABASE_KEY }}) \
                 --secret id=supabase_url,src=<(echo ${{ secrets.SUPABASE_URL }}) \
-                -t reptrack.azurecr.io/django-app:latest .
+                -t reptrackproduction.azurecr.io/django-app:latest .
 
 
 
@@ -53,7 +53,7 @@ jobs:
                      -e SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
                      -e SMTP_EMAIL=${{ secrets.SMTP_EMAIL }} \
                      -e SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }} \
-                     -p 8000:8000 reptrack.azurecr.io/django-app:latest
+                     -p 8000:8000 reptrackproduction.azurecr.io/django-app:latest
           sleep 30
           curl --fail http://localhost:8000/ || (docker logs django-backend && exit 1)
           docker stop django-backend
@@ -61,12 +61,12 @@ jobs:
 
       # Step 6: Push the Docker image to ACR
       - name: Push Docker image
-        run: docker push reptrack.azurecr.io/django-app:latest
+        run: docker push reptrackproduction.azurecr.io/django-app:latest
 
       # Step 7: Deploy the Docker image to Azure Web App
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: Reptrack-production
-          images: reptrack.azurecr.io/django-app:latest
+          app-name: reptrackproduction-production
+          images: reptrackproduction.azurecr.io/django-app:latest
           
