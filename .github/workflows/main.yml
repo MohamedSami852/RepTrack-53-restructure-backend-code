@@ -44,6 +44,8 @@ jobs:
                 -t reptrack.azurecr.io/django-app:latest .
 
 
+      - name: List Local Docker Images
+        run: docker images
 
       # Step 5: Run the Docker container locally
       - name: Run Docker Container
