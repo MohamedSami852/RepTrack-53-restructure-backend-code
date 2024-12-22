@@ -45,15 +45,17 @@ jobs:
 
 
 
-      # Step 5: Test the Docker image locally
-      - name: Run Docker container to test
+      # Step 5: Run the Docker container
+      - name: Run Docker Container
         run: |
-          docker run -d --name django-backend \
-                     -e SUPABASE_KEY=${{ secrets.SUPABASE_KEY }} \
-                     -e SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
-                     -e SMTP_EMAIL=${{ secrets.SMTP_EMAIL }} \
-                     -e SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }} \
-                     -p 8000:8000 reptrack.azurecr.io/django-app:latest
+          docker run -d \
+            -e SMTP_EMAIL=${{ secrets.SMTP_EMAIL }} \
+            -e SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }} \
+            -e SUPABASE_KEY=${{ secrets.SUPABASE_KEY }} \
+            -e SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
+            -p 8000:8000 \
+            --name django-app \
+            reptrack.azurecr.io/django-app:latest
           sleep 30
           curl --fail http://localhost:8000/ || (docker logs django-backend && exit 1)
           docker stop django-backend
