@@ -26,7 +26,7 @@ jobs:
 
       # Step 3: Log in to Azure Container Registry
       - name: Log in to ACR
-        run: echo "${{ secrets.ACR_PASSWORD }}" | docker login reptrack.azurecr.io -u "${{ secrets.ACR_USERNAME }}" --password-stdin
+        run: echo "${{ secrets.ACR_PASSWORD }}" | docker login reptrackproduction.azurecr.io -u "${{ secrets.ACR_USERNAME }}" --password-stdin
       - name: Cleanup Previous Images
         run: docker image prune -af
       - name: Build Docker image
@@ -42,13 +42,13 @@ jobs:
                 --secret id=smtp_password,src=<(echo ${{ secrets.SMTP_PASSWORD }}) \
                 --secret id=supabase_key,src=<(echo ${{ secrets.SUPABASE_KEY }}) \
                 --secret id=supabase_url,src=<(echo ${{ secrets.SUPABASE_URL }}) \
-                -t reptrack.azurecr.io/django-app:latest .
+                -t reptrackproduction.azurecr.io/django-app:latest .
       - name: List Local Docker Images
         run: docker images
       - name: Verify Local Image Exists
-        run: docker images | grep reptrack.azurecr.io/django-app
+        run: docker images | grep reptrackproduction.azurecr.io/django-app
       - name: Tag Docker Image Locally
-        run: docker tag reptrack.azurecr.io/django-app:latest django-app:latest
+        run: docker tag reptrackproduction.azurecr.io/django-app:latest django-app:latest
       # Step 5: Run the Docker container locally
       - name: Run Docker Container
         run: |
@@ -66,12 +66,12 @@ jobs:
           # docker rm django-backend
       # Step 6: Push the Docker image to ACR
       - name: Push Docker image
-        run: docker push reptrack.azurecr.io/django-app:latest
+        run: docker push reptrackproduction.azurecr.io/django-app:latest
 
       # Step 7: Deploy the Docker image to Azure Web App
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: Reptrack-production
-          images: reptrack.azurecr.io/django-app:latest
+          app-name: reptrackproduction-production
+          images: reptrackproduction.azurecr.io/django-app:latest
           
