@@ -46,7 +46,8 @@ jobs:
 
       - name: List Local Docker Images
         run: docker images
-
+      - name: Tag Docker Image Locally
+        run: docker tag reptrack.azurecr.io/django-app:latest django-app:latest
       # Step 5: Run the Docker container locally
       - name: Run Docker Container
         run: |
