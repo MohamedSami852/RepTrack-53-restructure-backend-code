@@ -28,27 +28,21 @@ jobs:
       - name: Log in to ACR
         run: echo "${{ secrets.ACR_PASSWORD }}" | docker login reptrack.azurecr.io -u "${{ secrets.ACR_USERNAME }}" --password-stdin
       
-      - name: Build Docker image
-        env:
-          ENVIRONMENT: production
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD}}
-          SMTP_EMAIL: ${{ secrets.SMTP_EMAIL }}
+      # Step 1: Build the Docker image locally
+      - name: Build Docker Image
         run: |
-          DOCKER_BUILDKIT=1 docker build \
-                --secret id=smtp_email,src=<(echo ${{ secrets.SMTP_EMAIL }}) \
-                --secret id=smtp_password,src=<(echo ${{ secrets.SMTP_PASSWORD }}) \
-                --secret id=supabase_key,src=<(echo ${{ secrets.SUPABASE_KEY }}) \
-                --secret id=supabase_url,src=<(echo ${{ secrets.SUPABASE_URL }}) \
-                -t reptrack.azurecr.io/django-app:latest .
-
-
-      - name: List Local Docker Images
-        run: docker images
-      - name: Tag Docker Image Locally
-        run: docker tag reptrack.azurecr.io/django-app:latest django-app:latest
-      # Step 5: Run the Docker container locally
+          docker build \
+            --build-arg SMTP_EMAIL=${{ secrets.SMTP_EMAIL }} \
+            --build-arg SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }} \
+            --build-arg SUPABASE_KEY=${{ secrets.SUPABASE_KEY }} \
+            --build-arg SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
+            -t reptrack.azurecr.io/django-app:latest .
+      
+      # Step 2: Verify local image exists
+      - name: Verify Local Image Exists
+        run: docker images | grep reptrack.azurecr.io/django-app
+      
+      # Step 3: Run the container using the local image
       - name: Run Docker Container
         run: |
           docker run -d \
@@ -58,11 +52,19 @@ jobs:
             -e SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
             -p 8000:8000 \
             --name django-app \
-            django-app:latest
-          # sleep 30
-          # curl --fail http://localhost:8000/ || (docker logs django-backend && exit 1)
-          # docker stop django-backend
-          # docker rm django-backend
+            reptrack.azurecr.io/django-app:latest
+      
+      # Step 4: Optional health check
+      - name: Health Check
+        run: |
+          sleep 10
+          curl --fail http://localhost:8000/ || (docker logs django-app && exit 1)
+      
+      # Step 5: Cleanup
+      - name: Stop and Remove Container
+        run: |
+          docker stop django-app
+          docker rm django-app
 
       # Step 6: Push the Docker image to ACR
       - name: Push Docker image
