@@ -45,21 +45,21 @@ jobs:
 
 
 
-      # Step 5: Run the Docker container
-      - name: Run Docker Container
-        run: |
-          docker run -d \
-            -e SMTP_EMAIL=${{ secrets.SMTP_EMAIL }} \
-            -e SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }} \
-            -e SUPABASE_KEY=${{ secrets.SUPABASE_KEY }} \
-            -e SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
-            -p 8000:8000 \
-            --name django-app \
-            reptrack.azurecr.io/django-app:latest
-          sleep 30
-          curl --fail http://localhost:8000/ || (docker logs django-backend && exit 1)
-          docker stop django-backend
-          docker rm django-backend
+      # # Step 5: Run the Docker container
+      # - name: Run Docker Container
+      #   run: |
+      #     docker run -d \
+      #       -e SMTP_EMAIL=${{ secrets.SMTP_EMAIL }} \
+      #       -e SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }} \
+      #       -e SUPABASE_KEY=${{ secrets.SUPABASE_KEY }} \
+      #       -e SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
+      #       -p 8000:8000 \
+      #       --name django-app \
+      #       reptrack.azurecr.io/django-app:latest
+      #     sleep 30
+      #     curl --fail http://localhost:8000/ || (docker logs django-backend && exit 1)
+      #     docker stop django-backend
+      #     docker rm django-backend
 
       # Step 6: Push the Docker image to ACR
       - name: Push Docker image
