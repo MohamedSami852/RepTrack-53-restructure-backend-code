@@ -27,7 +27,8 @@ jobs:
       # Step 3: Log in to Azure Container Registry
       - name: Log in to ACR
         run: echo "${{ secrets.ACR_PASSWORD }}" | docker login reptrack.azurecr.io -u "${{ secrets.ACR_USERNAME }}" --password-stdin
-      
+      - name: Cleanup Previous Images
+        run: docker image prune -af
       - name: Build Docker image
         env:
           ENVIRONMENT: production
