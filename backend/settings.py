@@ -26,7 +26,7 @@ SECRET_KEY = "django-insecure-fh9-$@*4t7c$5*x9on1-%z!#svehd&m_-egtpkby+1e1!1eul#
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [ 'reptrack-b8gqfdhsd8cwhgd8.westeurope-01.azurewebsites.net' ,'*']
+ALLOWED_HOSTS = [ 'reptrack-b8gqfdhsd8cwhgd8.westeurope-01.azurewebsites.net' ,'102.41.39.84']
 # settings.py
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
