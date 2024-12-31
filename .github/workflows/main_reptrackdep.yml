@@ -23,14 +23,14 @@ jobs:
       uses: docker/login-action@v2
       with:
         registry: https://reptrackdepp.azurecr.io/
-        username: ${{ secrets.AzureAppService_ContainerUsername_c6371d0a94784408b5763fb73e697001 }}
-        password: ${{ secrets.AzureAppService_ContainerPassword_ed6f09e6fe544175bac55b8f9b978315 }}
+        username: ${{ secrets.Azure_Username1 }}
+        password: ${{ secrets.Azure_Pass}}
 
     - name: Build and push container image to registry
       uses: docker/build-push-action@v3
       with:
         push: true
-        tags: reptrackdepp.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_c6371d0a94784408b5763fb73e697001 }}/reptrackdep.azurecr.io/rlkkeptrackdep/reptrackdep/v20:${{ github.sha }}
+        tags: reptrackdepp.azurecr.io/${{ secrets.Azure_Username }}/reptrackdep.azurecr.io/rlkkeptrackdep/reptrackdep/v20:${{ github.sha }}
         file: ./Dockerfile
 
   deploy:
@@ -48,4 +48,4 @@ jobs:
         app-name: 'reptrackdep'
         slot-name: 'production'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_147e494b5a7d4dbaa881de977c2c3c96 }}
-        images: 'reptrackdepp.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_c6371d0a94784408b5763fb73e697001 }}/reptrackdep.azurecr.io/rlkkeptrackdep/reptrackdep/v20:${{ github.sha }}'
+        images: 'reptrackdepp.azurecr.io/${{ secrets.Azure_Username }}/reptrackdep.azurecr.io/rlkkeptrackdep/reptrackdep/v20:${{ github.sha }}'
