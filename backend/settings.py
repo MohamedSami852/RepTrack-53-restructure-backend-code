@@ -26,9 +26,9 @@ SECRET_KEY = "django-insecure-fh9-$@*4t7c$5*x9on1-%z!#svehd&m_-egtpkby+1e1!1eul#
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [ 'https://reptrack-b8gqfdhsd8cwhgd8.westeurope-01.azurewebsites.net' ,'102.41.39.84']
+ALLOWED_HOSTS = ['reptrack.azurewebsites.net','102.41.39.84']
 CSRF_TRUSTED_ORIGINS = [
-    'https://reptrackdep-cpdybjc6hfdccvgm.canadacentral-01.azurewebsites.net'
+    'http://reptrack.azurewebsites.net','https://reptrack.azurewebsites.net'
 ]
 
 # settings.py
