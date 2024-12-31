@@ -23,7 +23,7 @@ jobs:
       uses: docker/login-action@v2
       with:
         registry: https://reptrackdepp.azurecr.io/
-        username: ${{ secrets.Azure_Username1 }}
+        username: ${{ secrets.Azure_Username }}
         password: ${{ secrets.Azure_Pass}}
 
     - name: Build and push container image to registry
